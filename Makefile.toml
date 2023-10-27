@@ -6,9 +6,10 @@ env_files = [
 [env]
 PROJECT_NAME = "duck-stream"
 ENV = ".env.local"
-# DATA_DIR = "./database/data"
+DATA_DIR = "server/database/data"
 DOCKER_COMPOSE_LOCAL = "docker/docker-compose.yaml"
 DOCKER_COMPOSE_LOCAL_SERVER = "docker/docker-compose.server.yaml"
+DOCKER_COMPOSE_LOCAL_DATABASE = "docker/docker-compose.database.yaml"
 
 [tasks.down]
 command = "docker"
@@ -23,10 +24,12 @@ args = [
     "--remove-orphans",
 ]
 
-[tasks.clean]
+[tasks.clear]
 dependencies = ["down"]
-# command = "rm"
-# args = ["-rf", "${DATA_DIR}"]
+script_runner = "@shell"
+script = '''
+rm -rf "${DATA_DIR}"
+'''
 
 [tasks.up]
 dependencies = ["down"]
@@ -39,6 +42,8 @@ args = [
     "${DOCKER_COMPOSE_LOCAL}",
     "-f",
     "${DOCKER_COMPOSE_LOCAL_SERVER}",
+    "-f",
+    "${DOCKER_COMPOSE_LOCAL_DATABASE}",
     "--env-file",
     "${ENV}",
     "up",

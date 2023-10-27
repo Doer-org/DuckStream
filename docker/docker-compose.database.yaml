@@ -1,0 +1,18 @@
+version: '3'
+services:
+  duck-stream-database:
+    build: 
+      context: ../server/database
+      dockerfile: Dockerfile
+      args:
+        - DB_LANG=ja_JP
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ../server/database/data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}

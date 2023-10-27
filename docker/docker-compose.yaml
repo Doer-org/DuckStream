@@ -1,6 +1,11 @@
 version: '3.9'
 services:
   duck-stream-server:
+    container_name: server
     restart: always
     tty: true
 
+  duck-stream-database:
+    container_name: database
+    restart: always
+    tty: true
