@@ -1,0 +1,7 @@
+**/obj
+**/bin
+.idea
+
+.env**local
+.env**production
+.fake
