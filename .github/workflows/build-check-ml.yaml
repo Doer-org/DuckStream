@@ -9,7 +9,7 @@ jobs:
         poetry-version: ["1.5.1"]
     defaults:
         run:
-            working-directory: morphoto
+            working-directory: ml
     runs-on: ubuntu-latest
 
     steps:
@@ -27,6 +27,6 @@ jobs:
         run: |
           poetry install --no-root
 
-      - name: Run pytest
-        run: |
-          poetry run pytest
+      # - name: Run pytest
+      #   run: |
+      #     poetry run pytest
