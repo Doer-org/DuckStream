@@ -4,7 +4,19 @@ from typing import List, Tuple
 
 import torch
 
-
+@dataclass
+class TextFilterConfig:
+    replace_word: str = "***"  # 不適切な単語を何に置換するか
+    sexual_file_path: str = (
+        "data/inappropriate-words-ja/Sexual.txt"
+        if os.path.exists("data/inappropriate-words-ja/Sexual.txt")
+        else "/root/data/inappropriate-words-ja/Sexual.txt"
+    )
+    offensive_file_path: str = (
+        "data/inappropriate-words-ja/Offensive.txt"
+        if os.path.exists("data/inappropriate-words-ja/Offensive.txt")
+        else "/root/data/inappropriate-words-ja/Offensive.txt"
+    )
 @dataclass
 class ChatGPTConfig:
     # https://gist.github.com/bluelovers/92dac6fe7dcbafd7b5ae0557e638e6ef?permalink_comment_id=4493653
@@ -26,5 +38,6 @@ class DiffusionConfig:
 
 @dataclass
 class MorphotoConfig:
+    text_filter_config: TextFilterConfig = field(default_factory=TextFilterConfig)
     chatgpt_config: ChatGPTConfig = field(default_factory=ChatGPTConfig)
     diffusion_config: DiffusionConfig = field(default_factory=DiffusionConfig)
