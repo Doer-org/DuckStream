@@ -2,7 +2,6 @@
 ### 準備 : トークンの設定
 ```bash
 echo 'OPENAI_API_KEY=your_openai_api_key' >> .env
-echo 'HUGGING_FACE_TOKEN=your_huggingface_token' >> .env
 ```
 ### モデルのダウンロード
 ```bash
