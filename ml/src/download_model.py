@@ -3,7 +3,7 @@ from diffusers import StableDiffusionImg2ImgPipeline
 
 
 def download_model(model_id: str, save_path: str) -> None:
-    pipe = StableDiffusionImg2ImgPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+    pipe = StableDiffusionImg2ImgPipeline.from_pretrained(model_id, torch_dtype=torch.float16, revision="fp16")
     pipe.save_pretrained(save_path)
 
 
