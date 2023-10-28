@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  duck-stream-ml:
+    build:
+      context: ../ml
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000

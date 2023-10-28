@@ -10,6 +10,7 @@ DATA_DIR = "server/database/data"
 DOCKER_COMPOSE_LOCAL = "docker/docker-compose.yaml"
 DOCKER_COMPOSE_LOCAL_SERVER = "docker/docker-compose.server.yaml"
 DOCKER_COMPOSE_LOCAL_DATABASE = "docker/docker-compose.database.yaml"
+DOCKER_COMPOSE_LOCAL_ML = "docker/docker-compose.ml.yaml"
 
 [tasks.down]
 command = "docker"
@@ -44,6 +45,8 @@ args = [
     "${DOCKER_COMPOSE_LOCAL_SERVER}",
     "-f",
     "${DOCKER_COMPOSE_LOCAL_DATABASE}",
+    # "-f",
+    # "${DOCKER_COMPOSE_LOCAL_ML}",
     "--env-file",
     "${ENV}",
     "up",
