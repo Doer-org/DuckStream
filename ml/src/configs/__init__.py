@@ -1,6 +1,7 @@
-from .config import ChatGPTConfig, DiffusionConfig, MorphotoConfig
+from .config import TextFilterConfig, ChatGPTConfig, DiffusionConfig, MorphotoConfig
 
 __all__ = [
+    "TextFilterConfig",
     "ChatGPTConfig",
     "DiffusionConfig",
     "MorphotoConfig",
