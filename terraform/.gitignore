@@ -1,4 +1,0 @@
-.env
-environments/
-**/.terraform
-**/terraform.tfvars
