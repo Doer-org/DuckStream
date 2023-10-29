@@ -18,8 +18,3 @@ variable "container_image" {
   description = "The container image to run"
   type        = string
 }
-
-variable "credential_path" {
-  description = "The path to the service account key file"
-  type        = string
-}

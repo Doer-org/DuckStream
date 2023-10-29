@@ -22,7 +22,7 @@ resource "google_cloud_run_service" "duckstream_api" {
   }
 }
 
-data "google_iam_policy" "noauth" {
+data "google_iam_policy" "public_access" {
   binding {
     role = "roles/run.invoker"
     members = [
@@ -31,10 +31,9 @@ data "google_iam_policy" "noauth" {
   }
 }
 
-resource "google_cloud_run_service_iam_policy" "noauth" {
-  location = google_cloud_run_service.duckstream_api.location
-  project  = google_cloud_run_service.duckstream_api.project
-  service  = google_cloud_run_service.duckstream_api.name
-
-  policy_data = data.google_iam_policy.noauth.policy_data
+resource "google_cloud_run_service_iam_policy" "public_access" {
+  location    = google_cloud_run_service.duckstream_api.location
+  project     = google_cloud_run_service.duckstream_api.project
+  service     = google_cloud_run_service.duckstream_api.name
+  policy_data = data.google_iam_policy.public_access.policy_data
 }
