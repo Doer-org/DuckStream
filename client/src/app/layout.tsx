@@ -1,12 +1,8 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { DelaGothic } from '../../font/font';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'Duck Stream',
-};
+export const metadata: Metadata = { title: 'Duck Stream' };
 
 export default function RootLayout({
   children,
@@ -15,7 +11,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en'>
-      <body className={inter.className}>{children}</body>
+      <body className={DelaGothic.className}>{children}</body>
     </html>
   );
 }
