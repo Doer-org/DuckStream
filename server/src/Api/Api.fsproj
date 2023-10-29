@@ -1,12 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
-
   <ItemGroup>
+    <Compile Include="Domain.fs" />
+    <Compile Include="Business\Persistence.fs" />
+    <Compile Include="Business\Infra.fs" />
+    <Compile Include="Business\CommandHandler.fs" />
+    <Compile Include="Repositories\ML.fs" />
+    <Compile Include="Repositories/GCS.fs" />
+    <Compile Include="Repositories\Database.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Dapper.FSharp" Version="4.7.0" />
+    <PackageReference Include="DotNetEnv" Version="2.5.0" />
+    <PackageReference Include="Falco" Version="4.0.4" />
+    <PackageReference Include="FsHttp" Version="11.0.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="4.10.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.10.0" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.6.0" />
+    <PackageReference Include="MySql.Data" Version="8.2.0" />
+  </ItemGroup>
 </Project>

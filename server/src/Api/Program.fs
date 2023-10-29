@@ -1,15 +1,28 @@
-open System
-open Microsoft.AspNetCore.Builder
-open Microsoft.Extensions.Hosting
+open Falco
+open Falco.Routing
+open Falco.HostBuilder
 
 [<EntryPoint>]
 let main args =
-    let builder = WebApplication.CreateBuilder(args)
-    let app = builder.Build()
+    webHost [||] {
+        endpoints [
+            get "/health" (Response.ofJson {| env = "local" |})
+            get "/health/ml" (Response.ofJson {| env = "local" |})
 
-    app.MapGet("/", Func<string>(fun () -> "Hello World!"))
-    |> ignore
+            get "/image/{id}" (Response.ofJson {| id = "1"; img = "base64" |})
 
-    app.Run()
+            (*
+                input: { parent_image: base64 }
+            *)
+            post
+                "/inference"
+                (Response.ofJson {|
+                    parent_id = "1"
+                    child_id = "1"
+                    img = "base64"
+                |})
+
+        ]
+    }
 
     0 // Exit code
