@@ -11,6 +11,7 @@
     <Compile Include="Repositories\ML.fs" />
     <Compile Include="Repositories/GCS.fs" />
     <Compile Include="Repositories\Database.fs" />
+    <Compile Include="Handler.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
