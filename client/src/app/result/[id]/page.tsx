@@ -1,5 +1,6 @@
 export default function Result({ params }: { params: { id: string } }) {
   const { id } = params;
+  // TODO: ここでid使ってfetchしてくる
   return (
     <main className='flex min-h-screen flex-col items-center justify-center gap-5 bg-secondary'>
       <h1 className='font-bold text-4xl text-main stroke-black text-stroke'>
