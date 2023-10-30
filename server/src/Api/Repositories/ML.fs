@@ -1,12 +1,12 @@
 module Repository.ML
 
-open Domain
-open FsHttp
+open System
 open System.Net
+open FsHttp
 open Application.Infra
 open Domain.Types
 
-type MLEnv = { ML_URL: string }
+type MLEnv = { ML_URL: string; timeout: TimeSpan }
 
 type MLRequest = {
     prompt: string
@@ -20,13 +20,14 @@ let inference (request: InferenceRequest) (env: MLEnv) =
         POST $"{env.ML_URL}/inference"
         body
         jsonSerialize request
+        config_timeout env.timeout
     }
     |> Request.sendAsync
     |> Async.map (fun resp ->
         if resp.statusCode = HttpStatusCode.OK then
             resp |> Response.deserializeJson<InferenceResponse> |> Ok
         else
-            Error(Failure "ML Server Error"))
+            Error(Timeout "ML Server Timeout Error"))
 
 let mlRepo env : Application.Infra.MLService = {
     inference = fun request -> inference request env
