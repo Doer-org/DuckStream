@@ -62,7 +62,7 @@ let uploadFile (base64: string) (env: GCS_ENV) =
     }
 
 
-let gcsStore env : Application.Persistence.RawImageRepo = {
+let gcsStore env : Application.Persistence.GCStorageRepo = {
     downloadBase64 = fun (fileName: string) -> getBase64FromGCS fileName env
     upload = fun base64 -> uploadFile base64 env
 }

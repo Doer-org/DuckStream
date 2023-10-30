@@ -8,7 +8,6 @@ type InfraError =
 
 type MLHealthResp = { status: string; device: string }
 
-
 type MLService = {
     health: unit -> Async<Result<MLHealthResp, InfraError>>
     inference: InferenceRequest -> Async<Result<InferenceResponse, InfraError>>

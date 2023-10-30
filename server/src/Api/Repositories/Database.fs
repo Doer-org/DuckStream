@@ -40,7 +40,7 @@ let conn (env: DBEnv) : IDbConnection =
 *)
 
 
-let morphotoRepo env : Application.Persistence.ImageInfoRepo = {
+let duckstreamRepo env : Application.Persistence.DuckStreamImageRepo = {
     register =
         fun morphoto ->
             let conn = conn env
