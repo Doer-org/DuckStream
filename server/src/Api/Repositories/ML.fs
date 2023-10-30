@@ -8,13 +8,6 @@ open Domain.Types
 
 type MLEnv = { ML_URL: string; timeout: TimeSpan }
 
-type MLRequest = {
-    prompt: string
-    image: string
-    strength: float
-    is_mock: bool option
-}
-
 let inference (request: InferenceRequest) (env: MLEnv) =
     http {
         POST $"{env.ML_URL}/inference"
