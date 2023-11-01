@@ -4,11 +4,10 @@ open System
 open System.Net
 open FsHttp
 open Application.Infra
-open Domain.Types
 
 type MLEnv = { ML_URL: string; TIMEOUT: TimeSpan }
 
-let inference (request: InferenceRequest) (env: MLEnv) =
+let inline private inference (request: MLInput) (env: MLEnv) =
     http {
         POST $"{env.ML_URL}/inference"
         body
@@ -18,22 +17,24 @@ let inference (request: InferenceRequest) (env: MLEnv) =
     |> Request.sendAsync
     |> Async.map (fun resp ->
         if resp.statusCode = HttpStatusCode.OK then
-            resp |> Response.deserializeJson<InferenceResponse> |> Ok
+            resp |> Response.deserializeJson<MLResult> |> Ok
         else
             Error(Timeout "ML Server Timeout Error"))
 
+let inline private health (env: MLEnv) =
+    http {
+        GET $"{env.ML_URL}/health"
+        body
+    }
+    |> Request.sendAsync
+    |> Async.map (fun resp ->
+        if resp.statusCode = HttpStatusCode.OK then
+            resp |> Response.deserializeJson<MLHealthResp> |> Ok
+        else
+            Error(Failure "ML Server Error"))
+
+
 let mlRepo env : Application.Infra.MLService = {
     inference = fun request -> inference request env
-    health =
-        fun () ->
-            http {
-                GET $"{env.ML_URL}/health"
-                body
-            }
-            |> Request.sendAsync
-            |> Async.map (fun resp ->
-                if resp.statusCode = HttpStatusCode.OK then
-                    resp |> Response.deserializeJson<MLHealthResp> |> Ok
-                else
-                    Error(Failure "ML Server Error"))
+    health = fun () -> health env
 }
