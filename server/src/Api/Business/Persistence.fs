@@ -9,12 +9,14 @@ type PersistenceError =
     | GCS of string
 
 type DuckStreamImageRepo = {
-    register: Image -> Async<Result<Image, PersistenceError>>
-    retrieve: Id -> Async<Result<Image, PersistenceError>>
+    saveImage: Image -> Async<Result<Image, PersistenceError>>
+    getImage: Id -> Async<Result<Image, PersistenceError>>
+    getInferenceResult: Id -> Async<Result<InferenceResult, PersistenceError>>
+    registerInferenceResult: InferenceResult -> Async<Result<unit, PersistenceError>>
 }
 
+
 type GCStorageRepo = {
-    upload:
-        Base64 -> Async<Result<Google.Apis.Storage.v1.Data.Object, PersistenceError>>
+    upload: Base64 -> Async<Result<Image, PersistenceError>>
     downloadBase64: Id -> Async<Result<Base64, PersistenceError>>
 }

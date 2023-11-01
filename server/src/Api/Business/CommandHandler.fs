@@ -19,7 +19,7 @@ type Repositories = {
 let getImage (repos: Repositories) (id: Id) =
     asyncResult {
         let! image =
-            repos.duckstreamImage.retrieve id
+            repos.duckstreamImage.getImage id
             |> AsyncResult.mapError Persistence
 
         return image
@@ -32,11 +32,7 @@ let saveImage (repos: Repositories) (base64: Base64) =
             |> AsyncResult.mapError Persistence
 
         let! image =
-            repos.duckstreamImage.register {
-                id = obj.Id
-                base64 = base64
-                url = obj.MediaLink
-            }
+            repos.duckstreamImage.saveImage { id = obj.id; url = obj.url }
             |> AsyncResult.mapError Persistence
 
         return image
@@ -50,9 +46,31 @@ let healthML (repos: Repositories) =
 
 let inference (repos: Repositories) (request: InferenceRequest) =
     asyncResult {
-        let! result =
-            repos.mlService.inference request
+        let! base64 =
+            repos.GCStorage.downloadBase64 request.id
+            |> AsyncResult.mapError Persistence
+
+        let! ml_result =
+            repos.mlService.inference {
+                prompt = request.prompt
+                image_base64 = base64
+            }
             |> AsyncResult.mapError Infra
 
-        return result
+        let! result_image = saveImage repos ml_result.image_base64
+
+        let! input_image = getImage repos request.id
+
+        let! _ =
+            let result = {
+                input_image = input_image
+                result_image = result_image
+                prompt = request.prompt
+                converted_prompt = ml_result.converted_prompt
+            }
+
+            repos.duckstreamImage.registerInferenceResult result
+            |> AsyncResult.mapError Persistence
+
+        return result_image
     }
