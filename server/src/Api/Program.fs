@@ -55,17 +55,7 @@ type Program =
 
 
 [<EntryPoint>]
-let main args =
-    let isTest = args.Length > 0 && args[0] = "test"
-
-    printfn "isTest: %b" isTest
-
-    let env = {
-        env with
-            environment = if isTest then "test" else env.environment
-    }
-
-
+let main _ =
     let errorHandler = Api.Handler.errorHandler true
 
     let repos = {
