@@ -6,8 +6,13 @@ open Application.CommandHandler
 open System
 open DotNetEnv
 
+type Environment =
+    | Local
+    | Mock
+    | Prod
+
 type AppEnv = {
-    environment: string
+    environment: Environment
     client_url: string
     db: Repository.Database.DBEnv
     gcs: Repository.GCS.GCS_ENV
@@ -19,15 +24,20 @@ let env =
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") = "Development"
 
     if isLocal then
-        Env.Load("../.env") |> ignore
+        Env.Load("../../.env") |> ignore
 
-    let ENVIRONMENT = Env.GetString("ENVIRONMENT")
+    let ENVIRONMENT =
+        match Env.GetString("ENVIRONMENT") with
+        | "local" -> Local
+        | "mock" -> Mock
+        | _ -> Prod
 
     {
         environment = ENVIRONMENT
         db = {
-            IS_DEV = ENVIRONMENT = "Development"
+            IS_DEV = ENVIRONMENT <> Prod
             DB_HOST = Env.GetString("DB_HOST")
+            DB_PORT = Env.GetInt("DB_PORT")
             DB_USER = Env.GetString("DB_USER")
             DB_PASSWORD = Env.GetString("DB_PASSWORD")
             DB_NAME = Env.GetString("DB_NAME")
@@ -51,13 +61,21 @@ type Program =
 
 [<EntryPoint>]
 let main _ =
-    let errorHandler = Api.Handler.errorHandler (env.environment = "local")
+    let errorHandler = Api.Handler.errorHandler (env.environment <> Prod)
 
-    let repos = {
-        duckstreamImage = Repository.Database.duckstreamRepo env.db
-        GCStorage = Repository.GCS.gcsStore env.gcs
-        mlService = Repository.ML.mlRepo env.ml
-    }
+    let repos =
+        if env.environment = Mock then
+            {
+                duckstreamImage = Repository.Database.duckstreamRepo env.db
+                GCStorage = Repository.Mock.mockGCS
+                mlService = Repository.Mock.mockMLService
+            }
+        else
+            {
+                duckstreamImage = Repository.Database.duckstreamRepo env.db
+                GCStorage = Repository.GCS.gcsStore env.gcs
+                mlService = Repository.ML.mlRepo env.ml
+            }
 
     webHost [||] {
         endpoints [
@@ -66,7 +84,7 @@ let main _ =
             get "/health/ml" (Api.Handler.healthML errorHandler repos)
             post "/image" (Api.Handler.saveImage errorHandler repos)
             get "/image/{id}" (Api.Handler.getImage errorHandler repos)
-            post "/inference/{id}" (Api.Handler.inference errorHandler repos)
+            post "/inference" (Api.Handler.inference errorHandler repos)
         ]
     }
 
