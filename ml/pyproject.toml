@@ -13,7 +13,8 @@ omegaconf = "^2.3.0"
 pillow = "^10.0.0"
 sympy = "^1.12"
 torch = [
-    { version = "^2.0.1+cu118", source = "torch_cu118", markers = "sys_platform != 'darwin'" },
+    { url = "https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp311-cp311-win_amd64.whl", markers = "sys_platform == 'win32'" },
+    { version = "^2.0.1+cu118", source = "torch_cu118", markers = "sys_platform == 'linux'" },
     { version = "^2.0.1+cpu", source = "torch_cpu", markers = "sys_platform == 'darwin'" },
 ]
 python-dotenv = "^1.0.0"
