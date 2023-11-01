@@ -15,14 +15,14 @@ type GCS_ENV = {
     GCS_URL: string
 }
 
-let private downloadImageAndConvertToBase64 (imageUrl: string) =
+let inline private downloadImageAndConvertToBase64 (imageUrl: string) =
     use httpClient = new HttpClient()
     let imageBytes = httpClient.GetByteArrayAsync(imageUrl)
     imageBytes.Wait()
     let base64String: Base64 = Convert.ToBase64String(imageBytes.Result)
     base64String
 
-let getBase64FromGCS (fileName: string) (env: GCS_ENV) =
+let inline private getBase64FromGCS (fileName: string) (env: GCS_ENV) =
     async {
         try
             let url = $"{env.GCS_URL}/{fileName}"
@@ -32,17 +32,23 @@ let getBase64FromGCS (fileName: string) (env: GCS_ENV) =
             return Error(PersistenceError.GCS e.Message)
     }
 
-let uploadFile (base64: string) (env: GCS_ENV) =
+let inline private uploadFile (base64: string) (env: GCS_ENV) =
     async {
         try
             let cred = GoogleCredential.FromJson(env.GCS_CREDENTIALS)
             let storage = StorageClient.Create(cred)
 
-            let regex = Regex("data:image/(.*);base64,(.*)")
+            let regex = Regex("data:([^;]+);base64,(.*)")
+
+            let contentType =
+                if regex.IsMatch base64 then
+                    regex.Match base64 |> fun m -> m.Groups[1].Value
+                else
+                    "image/png"
 
             let base64 =
                 if regex.IsMatch base64 then
-                    regex.Match base64 |> fun m -> m.Groups.[2].Value
+                    regex.Match base64 |> fun m -> m.Groups[2].Value
                 else
                     base64
 
@@ -52,12 +58,17 @@ let uploadFile (base64: string) (env: GCS_ENV) =
                 storage.UploadObject(
                     env.GCS_BUCKET_NAME,
                     Guid.NewGuid().ToString(),
-                    "image/png",
+                    contentType,
                     stream
                 )
 
-            return Ok r
+            return
+                Ok {
+                    id = r.Name
+                    url = $"{env.GCS_URL}/{r.Name}"
+                }
         with e ->
+            printfn "uploadFile error: %A" e
             return Error(PersistenceError.GCS e.Message)
     }
 
