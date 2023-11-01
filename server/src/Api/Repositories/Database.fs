@@ -15,15 +15,15 @@ type DBEnv = {
     DB_HOST: string
     DB_USER: string
     DB_PASSWORD: string
-    DB_DATABASE: string
+    DB_NAME: string
 }
 
 let conn (env: DBEnv) : IDbConnection =
     let connStr =
         if env.IS_DEV then
-            $"Server={env.DB_HOST};Port=3306;Database={env.DB_DATABASE};user={env.DB_USER};password={env.DB_PASSWORD}"
+            $"Server={env.DB_HOST};Port=3306;Database={env.DB_NAME};user={env.DB_USER};password={env.DB_PASSWORD}"
         else
-            $"Server={env.DB_HOST};Port=3306;Database={env.DB_DATABASE};user={env.DB_USER};password={env.DB_PASSWORD};SslMode=VerifyFull"
+            $"Server={env.DB_HOST};Port=3306;Database={env.DB_NAME};user={env.DB_USER};password={env.DB_PASSWORD};SslMode=VerifyFull"
 
     new MySqlConnection(connStr)
 

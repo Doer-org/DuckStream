@@ -6,14 +6,14 @@ open FsHttp
 open Application.Infra
 open Domain.Types
 
-type MLEnv = { ML_URL: string; timeout: TimeSpan }
+type MLEnv = { ML_URL: string; TIMEOUT: TimeSpan }
 
 let inference (request: InferenceRequest) (env: MLEnv) =
     http {
         POST $"{env.ML_URL}/inference"
         body
         jsonSerialize request
-        config_timeout env.timeout
+        config_timeout env.TIMEOUT
     }
     |> Request.sendAsync
     |> Async.map (fun resp ->

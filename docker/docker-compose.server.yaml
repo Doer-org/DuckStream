@@ -6,3 +6,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8080:8080
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - GCS_URL=${GCS_URL}
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME}
+      - GCS_CREDENTIALS=${GCS_CREDENTIALS}
+      - ML_URL=${ML_URL}
+      - ML_REQUEST_TIMEOUT_SEC=${ML_REQUEST_TIMEOUT_SEC}
+      - CLIENT_URL=${CLIENT_URL}

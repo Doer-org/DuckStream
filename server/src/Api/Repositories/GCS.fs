@@ -10,8 +10,8 @@ open System.Text.RegularExpressions
 open Application.Persistence
 
 type GCS_ENV = {
-    GCP_CREDENTIALS: string
-    GCP_BUCKET_NAME: string
+    GCS_CREDENTIALS: string
+    GCS_BUCKET_NAME: string
     GCS_URL: string
 }
 
@@ -35,7 +35,7 @@ let getBase64FromGCS (fileName: string) (env: GCS_ENV) =
 let uploadFile (base64: string) (env: GCS_ENV) =
     async {
         try
-            let cred = GoogleCredential.FromJson(env.GCP_CREDENTIALS)
+            let cred = GoogleCredential.FromJson(env.GCS_CREDENTIALS)
             let storage = StorageClient.Create(cred)
 
             let regex = Regex("data:image/(.*);base64,(.*)")
@@ -50,7 +50,7 @@ let uploadFile (base64: string) (env: GCS_ENV) =
 
             let r =
                 storage.UploadObject(
-                    env.GCP_BUCKET_NAME,
+                    env.GCS_BUCKET_NAME,
                     Guid.NewGuid().ToString(),
                     "image/png",
                     stream
