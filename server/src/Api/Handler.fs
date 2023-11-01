@@ -9,7 +9,7 @@ open Domain.Types
 let errorHandler (isDev: bool) (e: CommandError) : HttpHandler =
     if isDev then
         Response.withStatusCode 500
-        >> Response.ofJson {| error = e |}
+        >> Response.ofJson {| error = sprintf "%A" e |}
     else
         Response.withStatusCode 500
         >> Response.ofJson {| error = "error!" |}
