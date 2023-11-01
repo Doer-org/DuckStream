@@ -4,8 +4,9 @@ open Falco.HostBuilder
 open Application.CommandHandler
 
 open System
+open DotNetEnv
 
-type Env = {
+type AppEnv = {
     environment: string
     client_url: string
     db: Repository.Database.DBEnv
@@ -18,35 +19,29 @@ let env =
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") = "Development"
 
     if isLocal then
-        // dotnetコマンドから起動するとき
-        DotNetEnv.Env.Load("../.env") |> ignore
+        Env.Load("../.env") |> ignore
 
-    let ENVIRONMENT = Environment.GetEnvironmentVariable("ENVIRONMENT")
+    let ENVIRONMENT = Env.GetString("ENVIRONMENT")
 
     {
         environment = ENVIRONMENT
         db = {
             IS_DEV = ENVIRONMENT = "Development"
-            DB_HOST = Environment.GetEnvironmentVariable("DB_HOST")
-            DB_USER = Environment.GetEnvironmentVariable("DB_USER")
-            DB_PASSWORD = Environment.GetEnvironmentVariable("DB_PASSWORD")
-            DB_NAME = Environment.GetEnvironmentVariable("DB_NAME")
+            DB_HOST = Env.GetString("DB_HOST")
+            DB_USER = Env.GetString("DB_USER")
+            DB_PASSWORD = Env.GetString("DB_PASSWORD")
+            DB_NAME = Env.GetString("DB_NAME")
         }
         gcs = {
-            GCS_CREDENTIALS = Environment.GetEnvironmentVariable("GCS_CREDENTIALS")
-            GCS_BUCKET_NAME = Environment.GetEnvironmentVariable("GCS_BUCKET_NAME")
-            GCS_URL = Environment.GetEnvironmentVariable("GCS_URL")
+            GCS_CREDENTIALS = Env.GetString("GCS_CREDENTIALS")
+            GCS_BUCKET_NAME = Env.GetString("GCS_BUCKET_NAME")
+            GCS_URL = Env.GetString("GCS_URL")
         }
         ml = {
-            ML_URL = Environment.GetEnvironmentVariable("ML_URL")
-            TIMEOUT =
-                TimeSpan.FromSeconds(
-                    // Environment.GetEnvironmentVariable("ML_REQUEST_TIMEOUT_SEC")
-                    // |> Double.Parse
-                    30.0
-                )
+            ML_URL = Env.GetString("ML_URL")
+            TIMEOUT = TimeSpan.FromSeconds(Env.GetDouble("ML_REQUEST_TIMEOUT_SEC"))
         }
-        client_url = "aaa" // Environment.GetEnvironmentVariable("CLIENT_URL")
+        client_url = Env.GetString("CLIENT_URL")
     }
 
 type Program =
@@ -56,7 +51,7 @@ type Program =
 
 [<EntryPoint>]
 let main _ =
-    let errorHandler = Api.Handler.errorHandler true
+    let errorHandler = Api.Handler.errorHandler (env.environment = "local")
 
     let repos = {
         duckstreamImage = Repository.Database.duckstreamRepo env.db
@@ -67,7 +62,7 @@ let main _ =
     webHost [||] {
         endpoints [
             get "/" (Response.ofJson {| hello = "world" |})
-            get "/health" (Response.ofJson {| env = env.environment |})
+            get "/health" (Response.ofJson {| env = env |})
             get "/health/ml" (Api.Handler.healthML errorHandler repos)
             post "/image" (Api.Handler.saveImage errorHandler repos)
             get "/image/{id}" (Api.Handler.getImage errorHandler repos)
