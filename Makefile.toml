@@ -33,7 +33,7 @@ rm -rf "${DATA_DIR}"
 '''
 
 [tasks.up]
-dependencies = ["down"]
+dependencies = ["clear"]
 command = "docker"
 args = [
     "compose",
@@ -52,3 +52,10 @@ args = [
     "up",
     "-d",
 ]
+
+[tasks.up-ml]
+cwd = "ml"
+script_runner = "@shell"
+script = ''' 
+poetry run src/main.py
+'''
