@@ -6,11 +6,16 @@ module Types =
 
     type Base64 = string
 
-    type Image = { id: Id; base64: Base64; url: string }
+    type Image = { id: Id; url: string }
 
-    type InferenceRequest = { prompt: string; image_base64: Base64 }
+    type InferenceRequest = { prompt: string; id: Id }
 
-    type InferenceResponse = { id: Id; image: Image }
+    type InferenceResult = {
+        input_image: Image
+        result_image: Image
+        prompt: string
+        converted_prompt: string
+    }
 
     type DomainError =
         /// 既に推論済みの画像を再度推論したら
@@ -24,4 +29,4 @@ module Types =
     type Event =
         | ImageRetrieved of Image
         | ImageSaved of Image
-        | InferenceCompleted of InferenceResponse
+        | InferenceCompleted of InferenceResult
