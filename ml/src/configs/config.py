@@ -31,6 +31,7 @@ class DiffusionConfig:
     threshold: int = 128
     dilation_num: int = 5
     kernel_size: int = 5
+    padding: int = 10
     seed: int = 42
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
 

@@ -3,7 +3,7 @@ import os
 import torch
 from diffusers import StableDiffusionImg2ImgPipeline
 from dotenv import load_dotenv
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageChops
 
 from configs import DiffusionConfig
 
@@ -49,9 +49,26 @@ class ImageConverter:
         for _ in range(self.config.dilation_num):
             binary_image = binary_image.filter(ImageFilter.MinFilter(self.config.kernel_size))
         return binary_image
+    
+    def crop_image(self, image):
+        bg = Image.new(image.mode, image.size, "white")
+        diff = ImageChops.difference(image, bg)
+        bbox = diff.getbbox()
+        
+        if not bbox:
+            return image
+        x1, y1, x2, y2 = bbox
+        x1 = max(0, x1 - self.config.padding)
+        y1 = max(0, y1 - self.config.padding)
+        x2 = min(image.width, x2 + self.config.padding)
+        y2 = min(image.height, y2 + self.config.padding)
+        cropped_image = image.crop((x1, y1, x2, y2))
+        return cropped_image
+         
 
     def convert(self, prompt: str, image, strength: float = 0.8):
         image = image.convert("RGB")
+        image = self.crop_image(image)
         image = self.dilate_line(image)
         image = self.resize_image(image)
         image = self.model(
@@ -68,7 +85,7 @@ if __name__ == "__main__":
 
     diffusion_config = OmegaConf.create(DiffusionConfig)
     prompt = "best quality masterpiece makoto shinkai duck"
-    image_path = "data/sample/poor_duck2.png"
+    image_path = "data/sample/poor_duck3.png"
     image = Image.open(image_path)
     converter = ImageConverter(diffusion_config)
     image = converter.convert(prompt, image)
