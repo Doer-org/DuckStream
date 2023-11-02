@@ -92,49 +92,44 @@ let mockDB: Application.Persistence.DuckStreamImageRepo =
 
                     return resp
                 }
-        getInferenceResult =
+        getInferenceResults =
             fun id ->
                 async {
                     let resp =
                         query {
-                            for result in inference_result do
-                                join image in images
-                                                  on
-                                                  (result.result_img_id = image.img_id)
-
-                                join img in images on (result.input_img_id = img.img_id)
-                                where (result.input_img_id = id)
+                            for ir in inference_result do
+                                join i1 in images on (ir.input_img_id = i1.img_id)
+                                join i2 in images on (ir.result_img_id = i2.img_id)
+                                where (ir.input_img_id = id)
 
                                 select {|
-                                    input_img_id = result.input_img_id
-                                    input_img_url = img.img_url
-                                    result_img_id = result.result_img_id
-                                    result_img_url = image.img_url
-                                    prompt = result.prompt
-                                    converted_prompt = result.converted_prompt
+                                    input_img_id = ir.input_img_id
+                                    input_img_url = i1.img_url
+                                    result_img_id = ir.result_img_id
+                                    result_img_url = i2.img_url
+                                    prompt = ir.prompt
+                                    converted_prompt = ir.converted_prompt
                                 |}
-
-                                take 1
                         }
-                        |> Seq.tryHead
-                        |> function
-                            | None -> Error(PersistenceError.DB "not found")
-                            | Some row ->
-                                let r: InferenceResult = {
-                                    input_image = {
-                                        id = row.input_img_id
-                                        url = row.input_img_url
-                                    }
-                                    result_image = {
-                                        id = row.result_img_id
-                                        url = row.result_img_url
-                                    }
-                                    prompt = row.prompt
-                                    converted_prompt = row.converted_prompt
+
+                        |> Seq.map (fun row ->
+
+                            let r: InferenceResult = {
+                                input_image = {
+                                    id = row.input_img_id
+                                    url = row.input_img_url
                                 }
+                                result_image = {
+                                    id = row.result_img_id
+                                    url = row.result_img_url
+                                }
+                                prompt = row.prompt
+                                converted_prompt = row.converted_prompt
+                            }
 
-                                r |> Ok
-
+                            r)
+                        |> Seq.toArray
+                        |> Ok
 
                     return resp
                 }

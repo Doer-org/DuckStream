@@ -74,3 +74,12 @@ let inference (repos: Repositories) (request: InferenceRequest) =
 
         return result_image
     }
+
+let getInferenceResults id (repos: Repositories) =
+    asyncResult {
+        let! results =
+            repos.duckstreamImage.getInferenceResults id
+            |> AsyncResult.mapError Persistence
+
+        return results
+    }
