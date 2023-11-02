@@ -5,8 +5,8 @@ import unittest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-from main import app
-from models import InferenceRequest
+from src.main import app
+from src.models import InferenceRequest
 
 client = TestClient(app)
 
