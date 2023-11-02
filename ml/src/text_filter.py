@@ -1,7 +1,7 @@
 import re
 from typing import List
 
-from configs import TextFilterConfig
+from .configs import TextFilterConfig
 
 
 class TextFilter:

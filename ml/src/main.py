@@ -11,9 +11,9 @@ from omegaconf import OmegaConf
 from PIL import Image
 from starlette.middleware.cors import CORSMiddleware
 
-from configs import DiffusionConfig, MorphotoConfig
-from models import InferenceRequest
-from morphoto import Morphoto
+from .configs import DiffusionConfig, MorphotoConfig
+from .models import InferenceRequest
+from .morphoto import Morphoto
 
 morphoto_config = OmegaConf.create(MorphotoConfig)
 morphoto = Morphoto(morphoto_config)

@@ -1,9 +1,9 @@
 from PIL import Image
 
-from configs import MorphotoConfig
-from text_filter import TextFilter
-from image_converter import ImageConverter
-from prompt_converter import PromptConverter
+from .configs import MorphotoConfig
+from .text_filter import TextFilter
+from .image_converter import ImageConverter
+from .prompt_converter import PromptConverter
 
 
 class Morphoto:

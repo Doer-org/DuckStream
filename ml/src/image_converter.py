@@ -5,7 +5,7 @@ from diffusers import StableDiffusionImg2ImgPipeline
 from dotenv import load_dotenv
 from PIL import Image, ImageFilter, ImageChops
 
-from configs import DiffusionConfig
+from .configs import DiffusionConfig
 
 
 class ImageConverter:
