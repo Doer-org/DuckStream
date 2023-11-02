@@ -52,5 +52,5 @@ args = [
 cwd = "ml"
 script_runner = "@shell"
 script = ''' 
-poetry run python src/main.py
+poetry run uvicorn src.main:app
 '''
