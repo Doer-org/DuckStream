@@ -4,3 +4,12 @@
 
 # DuckStream 
 鴨川ハッカソン2023
+
+
+# Development
+```sh
+# run
+cargo make up
+# clean up
+cargo make clear
+```
