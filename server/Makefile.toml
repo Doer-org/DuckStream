@@ -1,0 +1,7 @@
+[tasks.watch]
+command = "dotnet"
+args = ["watch", "run", "--project", "src/Api/Api.fsproj"]
+
+[tasks.test]
+command = "dotnet"
+args = ["test"]

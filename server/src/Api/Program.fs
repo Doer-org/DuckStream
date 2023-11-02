@@ -92,7 +92,7 @@ let main _ =
 
 
     let healthHandler =
-        Response.ofJson {|
+        let envInfo = {|
             db = {|
                 is_mock = env.is_mock.db
                 is_prod = env.db.IS_PROD
@@ -104,6 +104,8 @@ let main _ =
             |}
             client_url = env.client_url
         |}
+
+        Response.ofJson envInfo
 
     webHost [||] {
         endpoints [
