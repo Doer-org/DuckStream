@@ -1,8 +1,3 @@
-env_files = [
-    { path = "./.env.production", profile = "production" },
-    { path = "./.env.local", profile = "development" },
-]
-
 [env]
 PROJECT_NAME = "duck-stream"
 ENV = ".env.local"
