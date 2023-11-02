@@ -3,7 +3,7 @@ import os
 import openai
 from dotenv import load_dotenv
 
-from configs import ChatGPTConfig
+from .configs import ChatGPTConfig
 
 
 class PromptConverter:
