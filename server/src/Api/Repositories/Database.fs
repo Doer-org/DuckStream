@@ -13,7 +13,7 @@ open System
 OptionTypes.register ()
 
 type DBEnv = {
-    IS_DEV: bool
+    IS_PROD: bool
     DB_HOST: string
     DB_PORT: int
     DB_USER: string
@@ -23,10 +23,10 @@ type DBEnv = {
 
 let conn (env: DBEnv) : IDbConnection =
     let connStr =
-        if env.IS_DEV then
-            $"Host={env.DB_HOST};Username={env.DB_USER};Password={env.DB_PASSWORD};Database={env.DB_NAME}"
+        if env.IS_PROD then
+            $"Host={env.DB_HOST};Port={env.DB_PORT};Database={env.DB_NAME};Username={env.DB_USER};Password={env.DB_PASSWORD};SslMode=Require;Trust Server Certificate=true"
         else
-            $"Host={env.DB_HOST};Port={env.DB_PORT};Database={env.DB_NAME};user={env.DB_USER};password={env.DB_PASSWORD};SslMode=VerifyFull"
+            $"Host={env.DB_HOST};Username={env.DB_USER};Password={env.DB_PASSWORD};Database={env.DB_NAME}"
 
     new NpgsqlConnection(connStr)
 
