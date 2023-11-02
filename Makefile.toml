@@ -57,5 +57,5 @@ args = [
 cwd = "ml"
 script_runner = "@shell"
 script = ''' 
-poetry run src/main.py
+poetry run python src/main.py
 '''
