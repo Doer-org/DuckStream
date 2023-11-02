@@ -82,3 +82,20 @@ let inference
                 | Ok resp -> Response.ofJson {| data = resp |} ctx
                 | Error e -> errorHandler e ctx
         }
+
+let getResults
+    (errorHandler: CommandError -> HttpHandler)
+    (repos: Repositories)
+    : HttpHandler =
+    fun ctx ->
+        task {
+            let route = Request.getRoute ctx
+            let id: Id = route.Get("id")
+
+            let ret = getInferenceResults id repos |> Async.RunSynchronously
+
+            return
+                match ret with
+                | Ok resp -> Response.ofJson {| data = resp |} ctx
+                | Error e -> errorHandler e ctx
+        }

@@ -11,7 +11,7 @@ type PersistenceError =
 type DuckStreamImageRepo = {
     saveImage: Image -> Async<Result<Image, PersistenceError>>
     getImage: Id -> Async<Result<Image, PersistenceError>>
-    getInferenceResult: Id -> Async<Result<InferenceResult, PersistenceError>>
+    getInferenceResults: Id -> Async<Result<InferenceResult[], PersistenceError>>
     registerInferenceResult: InferenceResult -> Async<Result<unit, PersistenceError>>
 }
 

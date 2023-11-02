@@ -115,6 +115,7 @@ let main _ =
             post "/image" (Api.Handler.saveImage errorHandler repos)
             get "/image/{id}" (Api.Handler.getImage errorHandler repos)
             post "/inference" (Api.Handler.inference errorHandler repos)
+            get "/inference/{id}" (Api.Handler.getResults errorHandler repos)
         ]
     }
 

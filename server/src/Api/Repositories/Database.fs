@@ -57,6 +57,17 @@ module Table =
         converted_prompt: string
     }
 
+module QueryResult =
+    type GetInferenceResults = {
+        input_img_id: string
+        input_img_url: string
+        result_img_id: string
+        result_img_url: string
+        prompt: string
+        converted_prompt: string
+    }
+
+
 let duckstreamRepo env : Application.Persistence.DuckStreamImageRepo = {
     saveImage =
         fun morphoto ->
@@ -95,51 +106,41 @@ let duckstreamRepo env : Application.Persistence.DuckStreamImageRepo = {
             |> AsyncResult.mapError (fun e -> DB e.Message)
             |> Async.map (Result.bind id)
 
-    getInferenceResult =
+    getInferenceResults =
         fun img_id ->
             let conn = conn env
 
-            let query =
-                select {
-                    for result in table<Table.inference_result> do
-                        innerJoin image in table<Table.gcs_image>
-                                               on
-                                               (result.result_img_id = image.img_id)
+            let sql =
+                """
+                SELECT 
+                    ir.input_img_id AS input_img_id,
+                    i1.img_url AS input_img_url,
+                    ir.result_img_id AS result_img_id,
+                    i2.img_url AS result_img_url,
+                    ir.prompt AS prompt,
+                    ir.converted_prompt AS converted_prompt
+                FROM inference_result ir
+                INNER JOIN gcs_image i1 ON i1.img_id = ir.input_img_id
+                INNER JOIN gcs_image i2 ON i2.img_id = ir.result_img_id
+                WHERE ir.input_img_id = @img_id;
+                """
 
-                        innerJoin img in table<Table.gcs_image>
-                                             on
-                                             (result.input_img_id = img.img_id)
-
-                        where (result.input_img_id = img_id)
-                        take 1
-                }
-
-            query
-            |> conn.SelectAsync<{|
-                input_img_id: string
-                input_img_url: string
-                result_img_id: string
-                result_img_url: string
-                prompt: string
-                converted_prompt: string
-            |} >
+            conn.QueryAsync<QueryResult.GetInferenceResults>(sql, {| img_id = img_id |})
             |> Task.map (
-                Seq.tryHead
-                >> function
-                    | Some r ->
-                        Ok {
-                            input_image = {
-                                id = r.input_img_id
-                                url = r.input_img_url
-                            }
-                            result_image = {
-                                id = r.result_img_id
-                                url = r.result_img_url
-                            }
-                            prompt = r.prompt
-                            converted_prompt = r.converted_prompt
-                        }
-                    | None -> Error(DB "not found")
+                Seq.map (fun row -> {
+                    input_image = {
+                        id = row.input_img_id
+                        url = row.input_img_url
+                    }
+                    result_image = {
+                        id = row.result_img_id
+                        url = row.result_img_url
+                    }
+                    prompt = row.prompt
+                    converted_prompt = row.converted_prompt
+                })
+                >> Seq.toArray
+                >> Ok
             )
             |> AsyncResult.ofTask
             |> AsyncResult.mapError (fun e -> DB e.Message)
