@@ -5,11 +5,6 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  # push:
-  #   branches:
-  #     - main
-  #     - cd/**
-
   pull_request:
     branches:
       - main
@@ -26,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      # url: https://google.com
+
     strategy:
       matrix:
         path:
@@ -57,16 +52,6 @@ jobs:
           push: true
           tags: ${{ secrets.TF_VAR_CONTAINER_IMAGE }}:latest
 
-      # Terraformの設定
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      # Terraformの初期化
-      - name: Terraform Init
-        run: terraform -chdir=${{ matrix.path }} init
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
-
       # GitHub SecretsからTerraform変数を設定
       - name: Setup Terraform Variables
         run: |
@@ -78,27 +63,21 @@ jobs:
           echo "TF_VAR_bucket_name=${{ secrets.TF_VAR_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_service_name=${{ secrets.TF_VAR_SERVICE_NAME }}" >> $GITHUB_ENV
 
-      # Terraformプランの実行
-      - name: Terraform Plan
-        run: terraform -chdir=${{ matrix.path }} plan # -no-color > plan-output.txt
+      # Terraformの設定
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      # Terraformの初期化
+      - name: Terraform Init
+        run: terraform -chdir=${{ matrix.path }} init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
-      # # プラン結果をプルリクエストにコメントとして投稿
-      # - name: Comment PR with Plan Result
-      #   if: github.event_name == 'pull_request' && always()
-      #   uses: actions/github-script@v5
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     script: |
-      #       const fs = require('fs');
-      #       const planOutput = fs.readFileSync('terraform/gcp/duckstream/environments/prod/plan-output.txt', 'utf8');
-      #       github.rest.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: `**Terraform Plan Output:**\n\`\`\`\n${planOutput}\n\`\`\``
-      #       });
+      # Terraformプランの実行
+      - name: Terraform Plan
+        run: terraform -chdir=${{ matrix.path }} plan
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
   apply:
     needs: build
@@ -112,7 +91,6 @@ jobs:
           - gcp/duckstream/environments/prod
     environment:
       name: production
-      # url: https://google.com
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.confirm == 'yes' }}
     steps:
       - name: Checkout code
