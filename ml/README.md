@@ -1,22 +1,27 @@
-## 実行方法
-### 準備 : トークンの設定
+## 実行方法 : Poetry
+### トークン設定
 ```bash
 echo 'OPENAI_API_KEY=your_openai_api_key' >> .env
 echo 'HUGGING_FACE_TOKEN=your_huggingface_token' >> .env
 ```
-### モデルのダウンロード
+### インストール
 ```bash
 poetry install
-poetry run python src/download_model.py
 ```
-### 実行 + テスト
+### 実行
 ```bash
-poetry install
 poetry run uvicorn src.main:app
-poetry poetry run python -m pytest
 ```
-
+### テスト
+```bash
+poetry run pytest
+```
+## 実行方法 : Modal
+### 実行
+```bash
+modal run src/main.py
+```
 ### デプロイ
 ```bash
-poetry run modal deploy src/main.py
+modal deploy src/main.py
 ```
