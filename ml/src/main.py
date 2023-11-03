@@ -16,7 +16,7 @@ image = (
     .run_function(download_models)
 )
 
-stub = Stub("duckstream-fastapi", image=image)
+stub = Stub("duckstream-fastapi", image=image,secrets=[Secret.from_name("duckstream-ml-secrets")])
 @stub.cls(gpu=gpu.T4(),container_idle_timeout=240)
 class Model:
     def __enter__(self):
@@ -50,9 +50,10 @@ class Model:
 def main():
     import uvicorn
     from fastapi import FastAPI
+    
     app = FastAPI()
-
     model_instance = Model()
+    
     @app.post("/inference")
     def inference(request: InferenceRequest):
         return model_instance.inference.remote(request)
@@ -64,7 +65,7 @@ def main():
 
 @stub.function(
     container_idle_timeout=300,
-    secret=Secret.from_name("duckstream-ml-secrets"),
+    secrets=[Secret.from_name("duckstream-ml-secrets")],
 )
 @asgi_app()
 def app():
