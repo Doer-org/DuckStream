@@ -26,6 +26,7 @@ const KonvasEditor: FC<TKonvasEditorProps> = ({ pictureState, pointsState }) => 
   const getDistance = (p1: TPointer, p2: TPointer) => Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 
   // 現在はうまく動いていないが、将来的にピンチで拡大縮小ができるようになりたい
+  // https://konvajs.org/docs/sandbox/Multi-touch_Scale_Stage.html　を参考にreactでできるように置き換えたい
   const onTouchMove: KonvaNodeEvents["onTouchMove"] = (event) => {
     event.evt.preventDefault();
 
@@ -105,6 +106,7 @@ const KonvasEditor: FC<TKonvasEditorProps> = ({ pictureState, pointsState }) => 
   return (
     <Stage height={320} width={320} draggable onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} ref={stageRef}>
       <Layer ref={layerRef}>
+        {/* 既に出来上がっている絵を描画する */}
         {pictureState.state.map((points, i) => {
           return (
             <Line
@@ -113,11 +115,13 @@ const KonvasEditor: FC<TKonvasEditorProps> = ({ pictureState, pointsState }) => 
               lineCap="round"
               lineJoin="round"
               stroke="black"
+              // ちょっとラグがありそうなので修正したい
               points={[...(points.flat(Infinity) as number[]), 10, 10]}
             />
           );
         })}
 
+        {/* 今書いている線を描画する */}
         <Line
           strokeWidth={4}
           lineCap="round"
