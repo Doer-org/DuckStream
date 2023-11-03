@@ -19,13 +19,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TF_WORKING_DIR: gcp/duckstream/environments/prod
     environment:
       name: production
-
-    strategy:
-      matrix:
-        path:
-          - gcp/duckstream/environments/prod
 
     defaults:
       run:
@@ -69,13 +66,13 @@ jobs:
 
       # Terraformの初期化
       - name: Terraform Init
-        run: terraform -chdir=${{ matrix.path }} init
+        run: terraform -chdir=${{ env.TF_WORKING_DIR }} init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
       # Terraformプランの実行
       - name: Terraform Plan
-        run: terraform -chdir=${{ matrix.path }} plan
+        run: terraform -chdir=${{ env.TF_WORKING_DIR }} plan
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
@@ -85,10 +82,8 @@ jobs:
     defaults:
       run:
         working-directory: ./terraform
-    strategy:
-      matrix:
-        path:
-          - gcp/duckstream/environments/prod
+    env:
+      TF_WORKING_DIR: gcp/duckstream/environments/prod
     environment:
       name: production
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.confirm == 'yes' }}
@@ -100,6 +95,6 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Apply
-        run: terraform -chdir=${{ matrix.path }} apply -auto-approve
+        run: terraform -chdir=${{ env.TF_WORKING_DIR }} apply -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
