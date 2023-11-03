@@ -1,7 +1,7 @@
 [env]
 PROJECT_NAME = "duck-stream"
 ENV = ".env.local"
-DATA_DIR = "server/database/data"
+DATA_DIR = "database/data"
 DOCKER_COMPOSE_LOCAL = "docker/docker-compose.yaml"
 DOCKER_COMPOSE_LOCAL_SERVER = "docker/docker-compose.server.yaml"
 DOCKER_COMPOSE_LOCAL_DATABASE = "docker/docker-compose.database.yaml"
@@ -28,7 +28,7 @@ rm -rf "${DATA_DIR}"
 '''
 
 [tasks.up]
-dependencies = ["clear"]
+dependencies = ["down"]
 command = "docker"
 args = [
     "compose",
