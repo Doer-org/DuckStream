@@ -1,0 +1,118 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - cd/**
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "yes" to confirm apply.'
+        required: true
+        default: "no"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      # url: https://google.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Google Artifact Registry
+        uses: docker/login-action@v1
+        with:
+          registry: asia-northeast1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./server/src
+          push: true
+          tags: ${{ secrets.TF_VAR_CONTAINER_IMAGE }}:latest
+
+      # Terraformの設定
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      # Terraformの初期化
+      - name: Terraform Init
+        run: |
+          cd terraform/gcp/duckstream/environment/prod
+          terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+      # GitHub SecretsからTerraform変数を設定
+      - name: Setup Terraform Variables
+        run: |
+          echo "GOOGLE_CREDENTIALS=${{ secrets.GCP_SA_KEY }}" >> $GITHUB_ENV
+          echo "TF_VAR_project_id=${{ secrets.TF_VAR_PROJECT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_default_region=${{ secrets.TF_VAR_DEFAULT_REGION }}" >> $GITHUB_ENV
+          echo "TF_VAR_iam_sa_email=${{ secrets.TF_VAR_IAM_SA_EMAIL }}" >> $GITHUB_ENV
+          echo "TF_VAR_container_image=${{ secrets.TF_VAR_CONTAINER_IMAGE }}" >> $GITHUB_ENV
+          echo "TF_VAR_bucket_name=${{ secrets.TF_VAR_BUCKET_NAME }}" >> $GITHUB_ENV
+          echo "TF_VAR_service_name=${{ secrets.TF_VAR_SERVICE_NAME }}" >> $GITHUB_ENV
+
+      # Terraformプランの実行
+      - name: Terraform Plan
+        run: |
+          cd terraform/gcp/duckstream/environment/prod
+          terraform plan -no-color > plan-output.txt
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+      # プラン結果の出力
+      - name: Print Plan Result
+        run: cat terraform/gcp/duckstream/environment/prod/plan-output.txt
+
+      # プラン結果をプルリクエストにコメントとして投稿
+      - name: Comment PR with Plan Result
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const planOutput = fs.readFileSync('terraform/gcp/duckstream/environment/prod/plan-output.txt', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `**Terraform Plan Output:**\n\`\`\`\n${planOutput}\n\`\`\``
+            });
+
+  apply:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      # url: https://google.com
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.confirm == 'yes' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Apply
+        run: |
+          cd terraform/gcp/duckstream/environment/prod
+          terraform apply -auto-approve
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
