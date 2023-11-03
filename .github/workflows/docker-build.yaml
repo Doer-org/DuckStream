@@ -35,4 +35,4 @@ jobs:
         with:
           context: ./server/src
           push: true
-          tags: ${{ secrets.DOCKER_IMAGE_NAME }}:latest
+          tags: ${{ secrets.TF_VAR_CONTAINER_IMAGE }}:latest
