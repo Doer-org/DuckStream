@@ -53,11 +53,12 @@ let inference (repos: Repositories) (request: InferenceRequest) =
         let! ml_result =
             repos.mlService.inference {
                 prompt = request.prompt
-                image_base64 = base64
+                image = base64
+                strength = 0.8 // TODO: ENV
             }
             |> AsyncResult.mapError Infra
 
-        let! result_image = saveImage repos ml_result.image_base64
+        let! result_image = saveImage repos ml_result.converted_image
 
         let! input_image = getImage repos request.id
 
@@ -66,7 +67,7 @@ let inference (repos: Repositories) (request: InferenceRequest) =
                 input_image = input_image
                 result_image = result_image
                 prompt = request.prompt
-                converted_prompt = ml_result.converted_prompt
+                converted_prompt = ml_result.prompt
             }
 
             repos.duckstreamImage.registerInferenceResult result

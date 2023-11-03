@@ -27,9 +27,8 @@ let mockMLService: Application.Infra.MLService = {
         fun request ->
             async {
                 let resp: Application.Infra.MLResult = {
-                    image_base64 = request.image_base64
+                    converted_image = request.image
                     prompt = request.prompt
-                    converted_prompt = "converted_prompt"
                 }
 
                 return resp |> Ok

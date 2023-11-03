@@ -8,12 +8,15 @@ type InfraError =
 
 type MLHealthResp = { status: string; device: string }
 
-type MLInput = { prompt: string; image_base64: Base64 }
+type MLInput = {
+    prompt: string
+    image: Base64
+    strength: float
+}
 
 type MLResult = {
-    image_base64: Base64
+    converted_image: Base64
     prompt: string
-    converted_prompt: string
 }
 
 type MLService = {
