@@ -1,0 +1,28 @@
+env_files = [{ path = "./.env", profile = "development" }]
+
+[tasks.docker-build]
+command = "docker"
+args = ["build", "${SERVER_DOCKERFILE_PATH}", "-t", "${DOCKER_IMAGE_NAME}"]
+
+[tasks.docker-push]
+dependencies = ["docker-build"]
+command = "docker"
+args = ["push", "${DOCKER_IMAGE_NAME}"]
+
+[tasks.terraform-init]
+command = "terraform"
+args = ["-chdir=./gcp/duckstream/environments/${ENV}", "init"]
+
+[tasks.terraform-plan]
+dependencies = ["terraform-init"]
+command = "terraform"
+args = ["-chdir=./gcp/duckstream/environments/${ENV}", "plan"]
+
+[tasks.terraform-apply]
+dependencies = ["terraform-plan"]
+command = "terraform"
+args = [
+    "-chdir=./gcp/duckstream/environments/${ENV}",
+    "apply",
+    "--auto-approve",
+]

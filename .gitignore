@@ -6,5 +6,3 @@
 .env**local
 .env**production
 .fake
-
-terraform/
