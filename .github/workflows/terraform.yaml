@@ -80,11 +80,6 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
-      # プラン結果の出力
-      - name: Print Plan Result
-        if: always()
-        run: cat terraform/gcp/duckstream/environments/prod/plan-output.txt
-
       # プラン結果をプルリクエストにコメントとして投稿
       - name: Comment PR with Plan Result
         if: github.event_name == 'pull_request' && always()
