@@ -1,17 +1,19 @@
 "use clients";
 import { TActionState, TDrawCondition, TPicture, TPoints } from "@/types/app";
 import { toInitialXY, toXY } from "@/utils/position";
+import dynamic from "next/dynamic";
 import { FC, useEffect, useState } from "react";
-import KonvasEditor from "./KonvasEditor";
+
 type TPictureEditorProps = {
   pictureState: TActionState<TPicture>;
   drawConditionState: TActionState<TDrawCondition>;
 };
 
 // https://github.com/konvajs/react-konva#usage-with-nextjs の例通りでもできるが、フォントが合わなくなるので普通にimportしてる
-// const KonvasEditor = dynamic(() => import("./KonvasEditor"), { ssr: false });
+const KonvasEditor = dynamic(() => import("./KonvasEditor"), { ssr: false });
 
 export const DrawEditor: FC<TPictureEditorProps> = ({ pictureState, drawConditionState }) => {
+  // なんとかして初期値に現在地を常に取って来れるようにしておきたい..
   const [points, setPoints] = useState<TPoints>([]);
   // 別に取らなくても良さそう。
   const [initialPoints, setInitialPoints] = useState<TPoints>([]);
