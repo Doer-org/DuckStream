@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Terraform
 
 on:
   push:
@@ -52,7 +52,7 @@ jobs:
       # Terraformの初期化
       - name: Terraform Init
         run: |
-          cd terraform/gcp/duckstream/environment/prod
+          cd terraform/gcp/duckstream/environments/prod
           terraform init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
@@ -71,14 +71,14 @@ jobs:
       # Terraformプランの実行
       - name: Terraform Plan
         run: |
-          cd terraform/gcp/duckstream/environment/prod
+          cd terraform/gcp/duckstream/environments/prod
           terraform plan -no-color > plan-output.txt
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
       # プラン結果の出力
       - name: Print Plan Result
-        run: cat terraform/gcp/duckstream/environment/prod/plan-output.txt
+        run: cat terraform/gcp/duckstream/environments/prod/plan-output.txt
 
       # プラン結果をプルリクエストにコメントとして投稿
       - name: Comment PR with Plan Result
@@ -88,7 +88,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const planOutput = fs.readFileSync('terraform/gcp/duckstream/environment/prod/plan-output.txt', 'utf8');
+            const planOutput = fs.readFileSync('terraform/gcp/duckstream/environments/prod/plan-output.txt', 'utf8');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -112,7 +112,7 @@ jobs:
 
       - name: Terraform Apply
         run: |
-          cd terraform/gcp/duckstream/environment/prod
+          cd terraform/gcp/duckstream/environments/prod
           terraform apply -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
