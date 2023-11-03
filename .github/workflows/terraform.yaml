@@ -80,25 +80,25 @@ jobs:
 
       # Terraformプランの実行
       - name: Terraform Plan
-        run: terraform -chdir=${{ matrix.path }} plan -no-color > plan-output.txt
+        run: terraform -chdir=${{ matrix.path }} plan # -no-color > plan-output.txt
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
-      # プラン結果をプルリクエストにコメントとして投稿
-      - name: Comment PR with Plan Result
-        if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const planOutput = fs.readFileSync('terraform/gcp/duckstream/environments/prod/plan-output.txt', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `**Terraform Plan Output:**\n\`\`\`\n${planOutput}\n\`\`\``
-            });
+      # # プラン結果をプルリクエストにコメントとして投稿
+      # - name: Comment PR with Plan Result
+      #   if: github.event_name == 'pull_request' && always()
+      #   uses: actions/github-script@v5
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       const fs = require('fs');
+      #       const planOutput = fs.readFileSync('terraform/gcp/duckstream/environments/prod/plan-output.txt', 'utf8');
+      #       github.rest.issues.createComment({
+      #         issue_number: context.issue.number,
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: `**Terraform Plan Output:**\n\`\`\`\n${planOutput}\n\`\`\``
+      #       });
 
   apply:
     needs: build
