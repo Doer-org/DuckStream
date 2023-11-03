@@ -27,6 +27,14 @@ jobs:
     environment:
       name: production
       # url: https://google.com
+    strategy:
+      matrix:
+        path:
+          - gcp/duckstream/environments/prod
+
+    defaults:
+      run:
+        working-directory: ./terraform
 
     steps:
       - name: Checkout code
@@ -55,9 +63,7 @@ jobs:
 
       # Terraformの初期化
       - name: Terraform Init
-        run: |
-          cd terraform/gcp/duckstream/environments/prod
-          terraform init
+        run: terraform -chdir=${{ matrix.path }} init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
@@ -74,9 +80,7 @@ jobs:
 
       # Terraformプランの実行
       - name: Terraform Plan
-        run: |
-          cd terraform/gcp/duckstream/environments/prod
-          terraform plan -no-color > plan-output.txt
+        run: terraform -chdir=${{ matrix.path }} plan -no-color > plan-output.txt
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
@@ -99,6 +103,13 @@ jobs:
   apply:
     needs: build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+    strategy:
+      matrix:
+        path:
+          - gcp/duckstream/environments/prod
     environment:
       name: production
       # url: https://google.com
@@ -111,8 +122,6 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Apply
-        run: |
-          cd terraform/gcp/duckstream/environments/prod
-          terraform apply -auto-approve
+        run: terraform -chdir=${{ matrix.path }} apply -auto-approve
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
