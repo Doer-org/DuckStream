@@ -16,8 +16,8 @@ image = (
     .run_function(download_models)
 )
 
-stub = Stub("duckstream-fastapi", image=image,secrets=[Secret.from_name("duckstream-ml-secrets")])
-@stub.cls(gpu=gpu.T4(),container_idle_timeout=240)
+stub = Stub("duckstream-fastapi", image=image, secrets=[Secret.from_name("duckstream-ml-secrets")])
+@stub.cls(gpu=gpu.T4(),container_idle_timeout=60)
 class Model:
     def __enter__(self):
         from .morphoto import Morphoto
@@ -64,8 +64,7 @@ def main():
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 @stub.function(
-    container_idle_timeout=300,
-    secrets=[Secret.from_name("duckstream-ml-secrets")],
+    container_idle_timeout=60,
 )
 @asgi_app()
 def app():
