@@ -17,3 +17,69 @@ variable "container_image" {
   description = "The container image to run"
   type        = string
 }
+
+# application envs
+variable "app_environment" {
+  description = "The environment to deploy to"
+  type        = string
+}
+
+variable "app_db_name" {
+  description = "The name of the database"
+  type        = string
+}
+
+variable "app_db_user" {
+  description = "The name of the database user"
+  type        = string
+}
+
+variable "app_db_password" {
+  description = "The password of the database user"
+  type        = string
+}
+
+variable "app_db_host" {
+  description = "The host of the database"
+  type        = string
+}
+
+variable "app_db_port" {
+  description = "The port of the database"
+  type        = string
+}
+
+variable "app_server_port" {
+  description = "The port of the server"
+  type        = string
+}
+
+variable "app_gcs_url" {
+  description = "The url of the gcs bucket"
+  type        = string
+}
+
+variable "app_gcs_bucket" {
+  description = "The name of the gcs bucket"
+  type        = string
+}
+
+variable "app_gcs_key" {
+  description = "The key of the gcs bucket"
+  type        = string
+}
+
+variable "app_ml_url" {
+  description = "The url of the ml service"
+  type        = string
+}
+
+variable "app_ml_timeout" {
+  description = "The timeout of the ml service"
+  type        = string
+}
+
+variable "app_client_url" {
+  description = "The url of the client"
+  type        = string
+}
