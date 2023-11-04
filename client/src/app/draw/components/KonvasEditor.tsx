@@ -1,109 +1,94 @@
 "use client";
 import { TActionState, TPoints } from "@/types/app";
 import Konva from "konva";
-import { FC, useRef, useState } from "react";
-import { Layer, Line, Path, Stage, type KonvaNodeEvents } from "react-konva";
+import { FC, RefObject, useRef } from "react";
+import { KonvaNodeEvents, Layer, Line, Path, Stage } from "react-konva";
 
 type TPointer = { x: number; y: number };
 type TKonvasEditorProps = {
   pointsState: TActionState<TPoints>;
+  stageRef: RefObject<Konva.Stage>;
 };
 
-const KonvasEditor: FC<TKonvasEditorProps> = ({ pointsState }) => {
+const KonvasEditor: FC<TKonvasEditorProps> = ({ pointsState, stageRef }) => {
   Konva.hitOnDragEnabled = true;
-  const stageRef = useRef<Konva.Stage>(null);
+  // const stageRef = useRef<Konva.Stage>(null);
   const layerRef = useRef<Konva.Layer>(null);
   const lineRef = useRef<Konva.Line>(null);
-  const [lastDist, setLastDist] = useState(0);
-  const [dist, setDist] = useState(0);
-  const [lastCenter, setLastCenter] = useState<null | TPointer>(null);
-  const [newCenter, setNewCenter] = useState<null | TPointer>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [scale, setScale] = useState(1);
 
   const getCenter = (p1: TPointer, p2: TPointer): TPointer => ({ x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 });
   const getDistance = (p1: TPointer, p2: TPointer) => Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 
-  // 現在はうまく動いていないが、将来的にピンチで拡大縮小ができるようになりたい
-  // https://konvajs.org/docs/sandbox/Multi-touch_Scale_Stage.html　を参考にreactでできるように置き換えたい
-  const onTouchMove: KonvaNodeEvents["onTouchMove"] = (event) => {
-    event.evt.preventDefault();
+  let lastCenter: TPointer | null = null;
+  let lastDist = 0;
+  const onTouchMove: KonvaNodeEvents["onTouchMove"] = (e) => {
+    e.evt.preventDefault();
+    let touch1 = e.evt.touches[0];
+    let touch2 = e.evt.touches[1];
+    const stage = stageRef.current;
+    if (stage !== null) {
+      if (touch1 && touch2) {
+        if (stage.isDragging()) {
+          stage.stopDrag();
+        }
 
-    const t1 = event.evt.touches[0];
-    const t2 = event.evt.touches[1];
+        let p1 = {
+          x: touch1.clientX,
+          y: touch1.clientY,
+        };
+        let p2 = {
+          x: touch2.clientX,
+          y: touch2.clientY,
+        };
 
-    if (!stageRef.current) return;
+        if (!lastCenter) {
+          lastCenter = getCenter(p1, p2);
+          return;
+        }
+        let newCenter = getCenter(p1, p2);
 
-    if (t1 && !t2 && !stageRef.current.isDragging() && isDragging) {
-      stageRef.current.startDrag();
-      setIsDragging(false);
-    }
+        let dist = getDistance(p1, p2);
 
-    if (t1 && t2) {
-      if (stageRef.current.isDragging()) {
-        setIsDragging(true);
-        stageRef.current.stopDrag();
+        if (!lastDist) {
+          lastDist = dist;
+        }
+
+        // local coordinates of center point
+        let pointTo = {
+          x: (newCenter.x - stage.x()) / stage.scaleX(),
+          y: (newCenter.y - stage.y()) / stage.scaleX(),
+        };
+
+        let scale = stage.scaleX() * (dist / lastDist);
+
+        stage.scaleX(scale);
+        stage.scaleY(scale);
+
+        // calculate new position of the stage
+        let dx = newCenter.x - lastCenter.x;
+        let dy = newCenter.y - lastCenter.y;
+
+        let newPos = {
+          x: newCenter.x - pointTo.x * scale + dx,
+          y: newCenter.y - pointTo.y * scale + dy,
+        };
+
+        stage.position(newPos);
+        stage.batchDraw();
+
+        lastDist = dist;
+        lastCenter = newCenter;
       }
-
-      const p1 = { x: t1.clientX, y: t2.clientY };
-      const p2 = { x: t1.clientX, y: t2.clientY };
-
-      if (!lastCenter) {
-        setLastCenter(getCenter(p1, p2));
-        return;
-      }
-      setNewCenter(getCenter(p1, p2));
-
-      setDist(getDistance(p1, p2));
-
-      if (!lastDist) setLastDist(dist);
-      if (!newCenter) return;
-
-      const pointTo = {
-        x: (newCenter.x - stageRef.current.x()) / stageRef.current.scaleX(),
-        y: (newCenter.y - stageRef.current.y()) / stageRef.current.scaleX(),
-      };
-
-      // stageRef.current.scaleX()とかがちゃんと取れていない雰囲気がある
-      setScale(stageRef.current.scaleX() * (dist / lastDist));
-
-      stageRef.current.scaleX(scale);
-      stageRef.current.scaleY(scale);
-
-      setLastCenter(getCenter(p1, p2));
-      const dx = newCenter.x - lastCenter.x;
-      const dy = newCenter.y - lastCenter.y;
-
-      const newPos = {
-        x: newCenter.x - pointTo.x * scale + dx,
-        y: newCenter.y - pointTo.y * scale + dy,
-      };
-
-      stageRef.current.position(newPos);
-
-      setLastDist(dist);
-      setLastCenter(newCenter);
     }
-
-    if (!layerRef.current || !lineRef.current) {
-      return;
-    }
-
-    layerRef.current.add(lineRef.current);
-    stageRef.current.add(layerRef.current);
   };
 
-  const onTouchEnd: KonvaNodeEvents["onTouchEnd"] = (event) => {
-    const t1 = event.evt.touches[0];
-    const t2 = event.evt.touches[1];
-    if (t1 && t2) {
-      setLastDist(0);
-      setLastCenter(null);
-    }
+  const onTouchEnd = () => {
+    lastCenter = null;
+    lastDist = 0;
   };
 
   return (
-    <Stage height={320} width={320} draggable onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} ref={stageRef}>
+    <Stage height={500} width={500} draggable onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} ref={stageRef}>
       <Layer ref={layerRef}>
         {/* 今書いている線を描画する */}
         <Line
@@ -114,6 +99,7 @@ const KonvasEditor: FC<TKonvasEditorProps> = ({ pointsState }) => {
           points={[...(pointsState.state.flat(Infinity) as number[])]}
           ref={lineRef}
         />
+        <Line strokeWidth={4} lineCap="round" lineJoin="round" stroke="black" points={[1, 3, 10, 13]} ref={lineRef} />
         <Path />
       </Layer>
     </Stage>
