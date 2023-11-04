@@ -27,10 +27,10 @@ class ChatGPTConfig:
 @dataclass
 class DiffusionConfig:
     model: str = "data/stable-diffusion-v1-5"
-    max_size: int = 500
+    resize_size: int = 500
     threshold: int = 128
-    dilation_num: int = 5
-    kernel_size: int = 5
+    dilation_num: int = 3
+    kernel_size: int = 3
     padding: int = 10
     seed: int = 42
     device: str = "cuda" if torch.cuda.is_available() else "cpu"

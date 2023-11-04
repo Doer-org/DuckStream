@@ -27,20 +27,13 @@ class ImageConverter:
         width, height = image.size
 
         if width > height:
-            if width > self.config.max_size:
-                ratio = self.config.max_size / width
-                new_width = self.config.max_size
-                new_height = int(height * ratio)
-            else:
-                new_width, new_height = width, height
+            ratio = self.config.max_size / width
+            new_width = self.config.max_size
+            new_height = int(height * ratio)
         else:
-            if height > self.config.max_size:
-                ratio = self.config.max_size / height
-                new_height = self.config.max_size
-                new_width = int(width * ratio)
-            else:
-                new_width, new_height = width, height
-
+            ratio = self.config.max_size / height
+            new_height = self.config.max_size
+            new_width = int(width * ratio)
         image = image.resize((new_width, new_height))
         return image
 
@@ -69,8 +62,8 @@ class ImageConverter:
     def convert(self, prompt: str, image, strength: float = 0.8):
         image = image.convert("RGB")
         image = self.crop_image(image)
-        image = self.dilate_line(image)
         image = self.resize_image(image)
+        image = self.dilate_line(image)
         image = self.model(
             prompt=prompt,
             image=image,
