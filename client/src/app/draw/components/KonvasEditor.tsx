@@ -12,7 +12,6 @@ type TKonvasEditorProps = {
 
 const KonvasEditor: FC<TKonvasEditorProps> = ({ pointsState, stageRef }) => {
   Konva.hitOnDragEnabled = true;
-  // const stageRef = useRef<Konva.Stage>(null);
   const layerRef = useRef<Konva.Layer>(null);
   const lineRef = useRef<Konva.Line>(null);
 
@@ -21,57 +20,42 @@ const KonvasEditor: FC<TKonvasEditorProps> = ({ pointsState, stageRef }) => {
 
   let lastCenter: TPointer | null = null;
   let lastDist = 0;
+
   const onTouchMove: KonvaNodeEvents["onTouchMove"] = (e) => {
     e.evt.preventDefault();
     let touch1 = e.evt.touches[0];
     let touch2 = e.evt.touches[1];
+
     const stage = stageRef.current;
+
     if (stage !== null) {
       if (touch1 && touch2) {
-        if (stage.isDragging()) {
-          stage.stopDrag();
-        }
+        if (stage.isDragging()) stage.stopDrag();
 
-        let p1 = {
-          x: touch1.clientX,
-          y: touch1.clientY,
-        };
-        let p2 = {
-          x: touch2.clientX,
-          y: touch2.clientY,
-        };
+        let p1 = { x: touch1.clientX, y: touch1.clientY };
+        let p2 = { x: touch2.clientX, y: touch2.clientY };
 
         if (!lastCenter) {
           lastCenter = getCenter(p1, p2);
           return;
         }
-        let newCenter = getCenter(p1, p2);
 
+        let newCenter = getCenter(p1, p2);
         let dist = getDistance(p1, p2);
 
-        if (!lastDist) {
-          lastDist = dist;
-        }
+        if (!lastDist) lastDist = dist;
 
-        // local coordinates of center point
-        let pointTo = {
-          x: (newCenter.x - stage.x()) / stage.scaleX(),
-          y: (newCenter.y - stage.y()) / stage.scaleX(),
-        };
+        let pointTo = { x: (newCenter.x - stage.x()) / stage.scaleX(), y: (newCenter.y - stage.y()) / stage.scaleX() };
 
         let scale = stage.scaleX() * (dist / lastDist);
 
         stage.scaleX(scale);
         stage.scaleY(scale);
 
-        // calculate new position of the stage
         let dx = newCenter.x - lastCenter.x;
         let dy = newCenter.y - lastCenter.y;
 
-        let newPos = {
-          x: newCenter.x - pointTo.x * scale + dx,
-          y: newCenter.y - pointTo.y * scale + dy,
-        };
+        let newPos = { x: newCenter.x - pointTo.x * scale + dx, y: newCenter.y - pointTo.y * scale + dy };
 
         stage.position(newPos);
         stage.batchDraw();
@@ -99,7 +83,6 @@ const KonvasEditor: FC<TKonvasEditorProps> = ({ pointsState, stageRef }) => {
           points={[...(pointsState.state.flat(Infinity) as number[])]}
           ref={lineRef}
         />
-        <Line strokeWidth={4} lineCap="round" lineJoin="round" stroke="black" points={[1, 3, 10, 13]} ref={lineRef} />
         <Path />
       </Layer>
     </Stage>
