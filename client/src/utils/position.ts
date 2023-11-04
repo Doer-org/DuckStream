@@ -4,10 +4,27 @@ export const toXY = (position: GeolocationPosition): TPoint => {
   return [position.coords.longitude, position.coords.latitude];
 };
 
-// 座標で初期値はどんな数になるかわからないので一旦小数点以下で管理する
-// 1mあたり緯度 : 0.000008983148616
-// 1mあたり経度 : 0.000010966382364
-// なのでこの数で割って四捨五入した数をクライアント側では描画する？
+// canvas上で正確に図を書くための緯度と経度の修正
+type TToAppropriatePositionProps = { start: TPoint; current: GeolocationPosition };
+export const toAppropriatePosition = ({ start, current }: TToAppropriatePositionProps): TPoint => {
+  const startLongtitude = start[0];
+  const startLatitude = start[1];
+
+  const currentLongtitude = current.coords.longitude;
+  const currentLatitude = current.coords.latitude;
+
+  const longtitudeDiff = startLongtitude - currentLongtitude;
+  const latitudeDiff = startLatitude - currentLatitude;
+
+  // 1mあたりの緯度経度はだいたい0.00001なので1mを一の位のになるようにする。
+  const appropriateLongtitude = longtitudeDiff / 0.00001;
+  const appropriateLatitude = latitudeDiff / 0.00001;
+
+  //
+  console.log("toAppropriatePosition", [appropriateLongtitude, appropriateLatitude].toString());
+  return [appropriateLongtitude, appropriateLatitude];
+};
+
 export const toInitialXY = (position: GeolocationPosition): TPoint => {
   const longtitude = position.coords.longitude;
   const latitude = position.coords.latitude;
