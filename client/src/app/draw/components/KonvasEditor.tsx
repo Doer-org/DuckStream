@@ -1,16 +1,15 @@
 "use client";
-import { TActionState, TPicture, TPoints } from "@/types/app";
+import { TActionState, TPoints } from "@/types/app";
 import Konva from "konva";
 import { FC, useRef, useState } from "react";
 import { Layer, Line, Path, Stage, type KonvaNodeEvents } from "react-konva";
 
 type TPointer = { x: number; y: number };
 type TKonvasEditorProps = {
-  pictureState: TActionState<TPicture>;
   pointsState: TActionState<TPoints>;
 };
 
-const KonvasEditor: FC<TKonvasEditorProps> = ({ pictureState, pointsState }) => {
+const KonvasEditor: FC<TKonvasEditorProps> = ({ pointsState }) => {
   Konva.hitOnDragEnabled = true;
   const stageRef = useRef<Konva.Stage>(null);
   const layerRef = useRef<Konva.Layer>(null);
@@ -106,21 +105,6 @@ const KonvasEditor: FC<TKonvasEditorProps> = ({ pictureState, pointsState }) => 
   return (
     <Stage height={320} width={320} draggable onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} ref={stageRef}>
       <Layer ref={layerRef}>
-        {/* 既に出来上がっている絵を描画する */}
-        {pictureState.state.map((points, i) => {
-          return (
-            <Line
-              key={i}
-              strokeWidth={4}
-              lineCap="round"
-              lineJoin="round"
-              stroke="black"
-              // ちょっとラグがありそうなので修正したい
-              points={[...(points.flat(Infinity) as number[]), 10, 10]}
-            />
-          );
-        })}
-
         {/* 今書いている線を描画する */}
         <Line
           strokeWidth={4}
