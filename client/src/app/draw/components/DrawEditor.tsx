@@ -1,15 +1,16 @@
 "use clients";
 import { TActionState, TPoint, TPoints } from "@/types/app";
 import { toAppropriatePosition, toXY } from "@/utils/position";
+import { Stage } from "konva/lib/Stage";
 import dynamic from "next/dynamic";
-import { FC, useEffect, useState } from "react";
+import { FC, RefObject, useEffect, useState } from "react";
 
-type TDrawEditorProps = { pointsState: TActionState<TPoints> };
+type TDrawEditorProps = { pointsState: TActionState<TPoints>; stageRef: RefObject<Stage> };
 
 // https://github.com/konvajs/react-konva#usage-with-nextjs の例通りでもできるが、フォントが合わなくなるので普通にimportしてる
 const KonvasEditor = dynamic(() => import("./KonvasEditor"), { ssr: false });
 
-export const DrawEditor: FC<TDrawEditorProps> = ({ pointsState }) => {
+export const DrawEditor: FC<TDrawEditorProps> = ({ pointsState, stageRef }) => {
   const [start, setStart] = useState<TPoint>([0, 0]);
 
   // 初期値を入れる
@@ -41,7 +42,7 @@ export const DrawEditor: FC<TDrawEditorProps> = ({ pointsState }) => {
         </div>
       )}
       <div className="bg-white max-w-[95vw] mx-auto rounded-md overflow-hidden" onClick={pushPoint}>
-        <KonvasEditor pointsState={{ state: pointsState.state, setState: pointsState.setState }} />
+        <KonvasEditor pointsState={{ state: pointsState.state, setState: pointsState.setState }} stageRef={stageRef} />
       </div>
     </>
   );
