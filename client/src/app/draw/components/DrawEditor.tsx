@@ -22,13 +22,12 @@ export const DrawEditor: FC<TDrawEditorProps> = ({ pointsState, stageRef }) => {
 
   // クリックしたときに現在位置を入れている
   const pushPoint = async () => {
-    console.log("onPushPoint");
     await new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject);
-    }).then((data) => {
-      pointsState.setState([
-        ...pointsState.state,
-        toAppropriatePosition({ start, current: data as GeolocationPosition }),
+    }).then((position) => {
+      pointsState.setState((point) => [
+        ...point,
+        toAppropriatePosition({ start, current: position as GeolocationPosition }),
       ]);
     });
   };
