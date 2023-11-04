@@ -15,7 +15,7 @@ export default function Draw() {
   return (
     <div className={`${ZenMaruGothic.className} flex flex-col gap-1`}>
       <div className="flex gap-1 items-center flex-col">
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-2">
           <input
             id="title"
             placeholder="タイトル"
