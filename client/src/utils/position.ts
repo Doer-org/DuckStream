@@ -17,8 +17,8 @@ export const toAppropriatePosition = ({ start, current }: TToAppropriatePosition
   const latitudeDiff = startLatitude - currentLatitude;
 
   // 1mあたりの緯度経度はだいたい0.00001なので1mを一の位のになるようにする。
-  const appropriateLongtitude = longtitudeDiff / 0.00001;
-  const appropriateLatitude = latitudeDiff / 0.00001;
+  const appropriateLongtitude = longtitudeDiff / 0.00005;
+  const appropriateLatitude = latitudeDiff / 0.00005;
 
   //
   console.log("toAppropriatePosition", [appropriateLongtitude, appropriateLatitude].toString());
