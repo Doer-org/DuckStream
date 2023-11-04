@@ -42,7 +42,7 @@ export default function Draw() {
       </div>
       <DrawEditor pointsState={{ state: points, setState: setPoints }} stageRef={stageRef} />
       <div>
-        <p className="text-sm">キャンバス内のクリックで描画/移動が切り替えれます</p>
+        <p className="text-sm">キャンバス内のタップで現在位置に点を打てます</p>
       </div>
     </div>
   );
