@@ -25,25 +25,24 @@ export default function Draw() {
 
   return (
     <div className={`${ZenMaruGothic.className} flex flex-col gap-1`}>
-      <div className="flex gap-1 items-center flex-col">
-        <div className="flex justify-between gap-2">
-          <input
-            id="title"
-            placeholder="タイトル"
-            type="text"
-            className="p-1 rounded-sm"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <button onClick={onSubmit} className="border-2 p-1 rounded-sm">
-            保存
-          </button>
-        </div>
+      <div className="flex gap-1 max-w-[95vw] m-auto">
+        <input
+          id="title"
+          placeholder="タイトル"
+          type="text"
+          className="p-1 rounded-sm max-w-[70%]"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <button onClick={onSubmit} className="border-2 p-1 rounded-sm">
+          保存
+        </button>
       </div>
+
       <DrawEditor pointsState={{ state: points, setState: setPoints }} stageRef={stageRef} />
-      <div>
-        <p className="text-sm">キャンバス内のタップで現在位置に点を打てます</p>
-      </div>
+      <ul className="max-w-[95vw] m-auto">
+        <li className="text-sm">キャンバス内のタップで現在位置に点を打てます</li>
+      </ul>
     </div>
   );
 }

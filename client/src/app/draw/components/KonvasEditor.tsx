@@ -72,7 +72,7 @@ const KonvasEditor: FC<TKonvasEditorProps> = ({ pointsState, stageRef }) => {
   };
 
   return (
-    <Stage height={500} width={500} draggable onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} ref={stageRef}>
+    <Stage height={400} width={400} draggable onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} ref={stageRef}>
       <Layer ref={layerRef}>
         {/* 今書いている線を描画する */}
         <Line

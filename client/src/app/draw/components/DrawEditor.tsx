@@ -36,7 +36,7 @@ export const DrawEditor: FC<TDrawEditorProps> = ({ pointsState, stageRef }) => {
     <>
       {/* 初期値が入るまではviewを表示しない。TODO: 別コンポーネントに分けたい */}
       {!start[0] && (
-        <div className="w-screen h-screen bg-white absolute top-0 flex items-center justify-center">
+        <div className="w-screen h-screen bg-white absolute top-0 left-0 flex items-center justify-center">
           現在位置の取得中...
         </div>
       )}
