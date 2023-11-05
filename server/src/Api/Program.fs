@@ -113,18 +113,16 @@ let main _ =
             options.AddPolicy(
                 "CorsPolicy",
                 fun policyBuilder ->
-                    // policyBuilder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
+                    policyBuilder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
                     //
-                    policyBuilder
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .WithOrigins(
-                            [|
-                                env.client_url
-                                "http://localhost:3000"
-                                "https://duck-stream.doer-app.com/"
-                            |]
-                        )
+                    // https://duckstream-6am45n7bnq-an.a.run.app
+                    // .WithOrigins(
+                    //     [|
+                    //         env.client_url
+                    //         "http://localhost:3000"
+                    //         "https://duck-stream.doer-app.com/"
+                    //     |]
+                    // )
                     |> ignore
             ))
 
