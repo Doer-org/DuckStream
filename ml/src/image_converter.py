@@ -61,9 +61,9 @@ class ImageConverter:
 
     def convert(self, prompt: str, image, strength: float = 0.8):
         image = image.convert("RGB")
-        image = self.crop_image(image)
+        #image = self.crop_image(image)
         image = self.resize_image(image)
-        image = self.dilate_line(image)
+        #image = self.dilate_line(image)
         image = self.model(
             prompt=prompt,
             image=image,
