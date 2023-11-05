@@ -114,7 +114,15 @@ let main _ =
                 fun builder ->
                     builder.AllowAnyHeader() |> ignore
                     builder.AllowAnyMethod() |> ignore
-                    builder.AllowAnyOrigin() |> ignore
+
+                    builder.WithOrigins(
+                        [|
+                            env.client_url
+                            "http://localhost"
+                            "https://duck-stream.vercel.app"
+                        |]
+                    )
+                    |> ignore
             ))
 
         endpoints [
