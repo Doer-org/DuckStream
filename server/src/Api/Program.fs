@@ -109,19 +109,23 @@ let main _ =
 
     webHost [||] {
         use_cors "CorsPolicy" (fun options ->
+
             options.AddPolicy(
                 "CorsPolicy",
-                fun builder ->
-                    builder.AllowAnyHeader() |> ignore
-                    builder.AllowAnyMethod() |> ignore
-
-                    builder.WithOrigins(
-                        [|
-                            env.client_url
-                            "http://localhost"
-                            "https://duck-stream.vercel.app"
-                        |]
-                    )
+                fun policyBuilder ->
+                    policyBuilder
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        //.AllowAnyOrigin()
+                        // Note: The URLs must not end with a /
+                        .WithOrigins(
+                            [|
+                                env.client_url
+                                "http://localhost:3000"
+                                "https://duck-stream.doer-app.com/"
+                            |]
+                        )
                     |> ignore
             ))
 
