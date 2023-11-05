@@ -59,8 +59,10 @@ export default function Draw() {
             保存
           </button>
         </div>
+        <div className={`${isPending && "hidden"}`}>
+          <DrawEditor pointsState={{ state: points, setState: setPoints }} stageRef={stageRef} />
+        </div>
 
-        <DrawEditor pointsState={{ state: points, setState: setPoints }} stageRef={stageRef} />
         <ul className="max-w-[95vw] m-auto">
           <li className="text-sm">キャンバス内のタップで現在位置に点を打てます</li>
         </ul>
