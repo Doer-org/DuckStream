@@ -57,13 +57,15 @@ class ImageConverter:
         y2 = min(image.height, y2 + self.config.padding)
         cropped_image = image.crop((x1, y1, x2, y2))
         return cropped_image
-         
-
+        
+    def replace_bg(self, image):
+        new_image = Image.new("RGBA", image.size, (255, 255, 255, 255))
+        new_image.paste(image, mask=image.split()[3]) 
+        return new_image
     def convert(self, prompt: str, image, strength: float = 0.8):
+        image = self.replace_bg(image)
         image = image.convert("RGB")
-        #image = self.crop_image(image)
         image = self.resize_image(image)
-        #image = self.dilate_line(image)
         image = self.model(
             prompt=prompt,
             image=image,
