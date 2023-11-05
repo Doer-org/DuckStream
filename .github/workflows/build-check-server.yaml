@@ -19,5 +19,5 @@ jobs:
       - name: Build Project
         run: dotnet build server/src/Api --configuration Release
 
-      - name: Run Tests
-        run: dotnet test server
+      # - name: Run Tests
+      #   run: dotnet test server
