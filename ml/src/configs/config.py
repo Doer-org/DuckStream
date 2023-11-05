@@ -27,7 +27,7 @@ class ChatGPTConfig:
 @dataclass
 class DiffusionConfig:
     model: str = "data/stable-diffusion-v1-5"
-    resize_size: int = 500
+    max_size: int = 500
     threshold: int = 128
     dilation_num: int = 3
     kernel_size: int = 3
