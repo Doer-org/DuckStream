@@ -65,6 +65,7 @@ export default function Draw() {
 
         <ul className="max-w-[95vw] m-auto">
           <li className="text-sm">キャンバス内のタップで現在位置に点を打てます</li>
+          <li className="text-sm">周りに気をつけて広い場所で遊んでください</li>
         </ul>
       </div>
     </>
