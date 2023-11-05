@@ -108,15 +108,14 @@ let main _ =
         Response.ofJson envInfo
 
     webHost [||] {
-        // use_cors "CorsPolicy" (fun options ->
-        // options.AddPolicy(
-        //     "CorsPolicy",
-        //     fun builder ->
-        //         builder.AllowAnyHeader() |> ignore
-        //         builder.AllowAnyMethod() |> ignore
-        //         builder.AllowAnyOrigin() |> ignore
-        //         builder.AllowCredentials() |> ignore
-        // ))
+        use_cors "CorsPolicy" (fun options ->
+            options.AddPolicy(
+                "CorsPolicy",
+                fun builder ->
+                    builder.AllowAnyHeader() |> ignore
+                    builder.AllowAnyMethod() |> ignore
+                    builder.AllowAnyOrigin() |> ignore
+            ))
 
         endpoints [
             get "/" (Response.ofJson {| hello = "world" |})
